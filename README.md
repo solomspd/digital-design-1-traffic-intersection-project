@@ -1,1 +1,1 @@
-# digital-design-1-trffic-intersection-project
+# digital-design-1-traffic-intersection-project
