@@ -10,7 +10,7 @@ light index:
 */
 
 
-module main_lights #(parameter tbase = 6) #(parameter tyel = 2) #(parameter text = 3) (input clk, reset, output reg ight);
+module main_lights #(parameter tbase = 6) #(parameter tyel = 2) #(parameter text = 3) (input clk, reset, output reg light);
 	reg [3:0]count
 	always (posedge clk)
 		if (reset) begin
@@ -18,9 +18,8 @@ module main_lights #(parameter tbase = 6) #(parameter tyel = 2) #(parameter text
 			count = 4'b0;
 		end else begin
 			count = count + 1;
-			if (side_st)
 			case (light)
-				2'd0 : if (count == tyel) count = 4'b0; light = 2'd3;
+				2'd0 : if (count == tyel) count = 4'b0; light = 2'd1;
 				2'd1 : if (count == 2 * tbase) count = 4'b0; light = 0;
 			endcase
 		end		
@@ -38,7 +37,6 @@ module side_lights #(parameter tbase = 6) #(parameter tyel = 2) #(parameter text
 			count = 4'b0;
 		end else begin
 			count = count + 1;
-			if (side_st)
 			case (light)
 				2'd0 : if (count == tyel) count = 4'b0; light = 2'd3;
 				2'd1 : if (count == tbase) count = 4'b0; light = 0;
@@ -76,10 +74,10 @@ module main (input clk, reset, sensor, output reg [1:0]main_light_out,[1:0]side_
 			side_r = 1;
 			main_light_out = 2'b0;
 			side_light_out = 2'b0;
-		end else if (main_l) begin
+		end else if (main_light) begin
 			main_light_out = 2'b3;
 			side_light_out = 2'b1;
-		end else if (side_light_out) begin
+		end else if (side_light) begin
 			main_light_out = 2'b1;
 			side_light_out = 2'b3;
 		end else begin
