@@ -52,7 +52,7 @@ state index:
 
 module basic_cycle(input clk, input reset, input sensor, input walk, output reg [1:0]main_light, output reg [1:0]side_light, output reg walk_light);
 	
-	reg [1:0] cur_state;
+	reg [2:0] cur_state;
 	reg [3:0] counter;
 	
 	reg sen_flag;
@@ -71,17 +71,16 @@ module basic_cycle(input clk, input reset, input sensor, input walk, output reg 
 	localparam R_y = 4'd3;
 	localparam R_r = 4'd4;
 	
-	localparam tbase = 4'd6;
-	localparam text = 4'd3;
-	localparam tyel = 4'd2;
-	
-	
+	 localparam tbase = 4'd6;
+     localparam text = 4'd3;
+     localparam   tyel = 4'd2;
 	
 	always @(posedge clk) begin
 	
 		counter <= counter + 1;
 		
 		if (reset) begin
+		 
 			cur_state <= R_y;
 			main_light <= 2'b0;
 			side_light <= 2'b0;
@@ -136,6 +135,7 @@ module basic_cycle(input clk, input reset, input sensor, input walk, output reg 
 						    main_light <= red;
 						    side_light <= red;
 						    walk_req <= 1'b0;
+						    walk_light <= 1'b1;
 						end
 					end
 				R_g:
@@ -159,6 +159,7 @@ module basic_cycle(input clk, input reset, input sensor, input walk, output reg 
 			            walk_req <= 1'b0;
 			            main_light <= red;
 			            side_light <= green;
+			            walk_light <= 1'b0;
 			        end
 			endcase 
 	end
