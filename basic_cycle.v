@@ -104,20 +104,16 @@ module basic_cycle(input clk, input reset, input sensor, input walk, output reg 
                 main_wait <= tbase + text;
             end
             
-            if (sen_flag & Y_r) begin
-                sen_flag <= 1'b0;
-                main_wait <= 2 * tbase;
-            end
-            
             if (sensor & R_g & counter == tbase) begin
                 sen_flag <= 1'b1;
                 side_wait <= tbase + text;
             end
-            
-            if (sen_flag & R_y) begin
+            if (sen_flag) begin
                 sen_flag <= 1'b0;
-                side_wait = tbase;
-            end
+                main_wait <= 2 * tbase;
+                side_wait <= tbase;
+                end
+            
             
 			case(cur_state)
 				G_r: 
