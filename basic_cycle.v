@@ -60,27 +60,31 @@ module basic_cycle(input clk, input reset, input sensor, input walk, output reg 
 	reg [3:0]main_wait;
 	reg [3:0]side_wait;
 	
-	localparam nan = 4'b0;
-	localparam green = 4'b1;
-	localparam yel = 4'd2;
-	localparam red = 4'd3;
+	parameter nan = 4'b0;
+	parameter green = 4'b1;
+	parameter yel = 4'd2;
+	parameter red = 4'd3;
 
-	localparam G_r = 4'd0;
-	localparam Y_r = 4'd1;
-	localparam R_g = 4'd2;
-	localparam R_y = 4'd3;
-	localparam R_r = 4'd4;
+	parameter G_r = 4'd0;
+	parameter Y_r = 4'd1;
+	parameter R_g = 4'd2;
+	parameter R_y = 4'd3;
+	parameter R_r = 4'd4;
 	
-	 localparam tbase = 4'd6;
-     localparam text = 4'd3;
-     localparam   tyel = 4'd2;
-	
+	 reg [3:0]tbase;
+     reg [3:0]text;
+     reg [3:0]tyel;
+//	localparam tbase = 4'd6;
+//          localparam text = 4'd3;
+//          localparam   tyel = 4'd2;
 	always @(posedge clk) begin
 	
 		counter <= counter + 1;
 		
 		if (reset) begin
-		 
+		   tbase <= 4'd6;
+		   text <= 4'd3;
+		   tyel  <= 4'd2;
 			cur_state <= R_y;
 			main_light <= 2'b0;
 			side_light <= 2'b0;
