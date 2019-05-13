@@ -51,6 +51,7 @@ state index:
 */
 
 module basic_cycle(input clk, input reset, input sensor, input walk, output reg [1:0]main_light, output reg [1:0]side_light, output reg walk_light);
+//output reg [6:0]to_seg, output reg [1:0]lights_on
 	
 	reg [2:0] cur_state;
 	reg [3:0] counter;
@@ -71,28 +72,37 @@ module basic_cycle(input clk, input reset, input sensor, input walk, output reg 
 	parameter R_y = 4'd3;
 	parameter R_r = 4'd4;
 	
-	 reg [3:0]tbase;
-     reg [3:0]text;
-     reg [3:0]tyel;
-//	localparam tbase = 4'd6;
-//          localparam text = 4'd3;
-//          localparam   tyel = 4'd2;
-	always @(posedge clk) begin
-	
+	reg [3:0]tbase;
+    reg [3:0]text;
+    reg [3:0]tyel;
+    
+//    reg light_out;
+    wire clk_out;
+    clockDivider pp (clk, rst, clk_out);
+   // light_to_seg qq(light_out, to_seg);
+	always @(posedge clk_out) begin
 		counter <= counter + 1;
+		
+//		light_out <= ~light_out;
+		
+//		case (light_out)
+//		  1'b0 : lights_on <= 4'b1110;
+//		  1'b1 : lights_on <= 4'b0111;
+//		endcase
 		
 		if (reset) begin
 		   tbase <= 4'd6;
 		   text <= 4'd3;
 		   tyel  <= 4'd2;
-			cur_state <= R_y;
-			main_light <= 2'b0;
-			side_light <= 2'b0;
-			counter <= 4'b0;
-			main_wait <= 2 * tbase;
-			side_wait <= tbase;
-			walk_light <= 1'b0;
-			walk_req <= 1'b0;
+		   //light_out <= 1'b0;
+		   cur_state <= R_y;
+		   main_light <= 2'b0;
+		   side_light <= 2'b0;
+		   counter <= 4'b0;
+		   main_wait <= 2 * tbase;
+		   side_wait <= tbase;
+		   walk_light <= 1'b0;
+		   walk_req <= 1'b0;
 		end
 		     
 		     if (walk & ~R_r) begin
