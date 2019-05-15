@@ -3,6 +3,28 @@
 // Company: 
 // Engineer: 
 // 
+// Create Date: 05/15/2019 12:26:47 PM
+// Design Name: 
+// Module Name: basy_cycle
+// Project Name: 
+// Target Devices: 
+// Tool Versions: 
+// Description: 
+// 
+// Dependencies: 
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
+
+
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: 
+// 
 // Create Date: 04/24/2019 02:37:27 PM
 // Design Name: 
 // Module Name: base_cycle
@@ -50,11 +72,13 @@ state index:
 
 */
 
-module basic_cycle(input clk, input reset, input sensor, input walk, output reg [1:0]main_light, output reg [1:0]side_light, output reg walk_light);
-//output reg [6:0]to_seg, output reg [1:0]lights_on
+module basic_cycle(input clk, input reset, input sensor, input walk, /*output reg [1:0]main_light, output reg [1:0]side_light,*/ output reg walk_light, output reg [6:0]to_seg, output reg [3:0]lights_on, output reg refresh);
 	
 	reg [2:0] cur_state;
 	reg [3:0] counter;
+	
+	reg [1:0]main_light;
+	reg [1:0]side_light;
 	
 	reg sen_flag;
 	reg walk_req;
@@ -76,25 +100,53 @@ module basic_cycle(input clk, input reset, input sensor, input walk, output reg 
     reg [3:0]text;
     reg [3:0]tyel;
     
-//    reg light_out;
+    reg [6:0]main_to_seg;
+    reg [6:0]side_to_seg;
+    
+    //reg refresh;
     wire clk_out;
+    
     clockDivider pp (clk, rst, clk_out);
-   // light_to_seg qq(light_out, to_seg);
+
+    always @(posedge clk) begin
+        
+        refresh <= ~refresh;
+        
+        case (refresh)
+                1'b0 : begin 
+                        lights_on <= 4'b0111; //isnt this to seg
+                        to_seg <= main_to_seg;
+                       end
+                1'b1 : begin
+                        lights_on <= 4'b1110;
+                        to_seg <= side_to_seg;
+                       end
+        endcase
+        
+        case (main_light)
+            2'b00 : main_to_seg <= 7'b0000001;
+            2'b01 : main_to_seg <= 7'b0010000;
+            2'b10 : main_to_seg <= 7'b1011000;
+            2'b11 : main_to_seg <= 7'b0111001; 
+        endcase
+        
+        case (side_light)
+            2'b00 : side_to_seg <= 7'b0000001;
+            2'b01 : side_to_seg <= 7'b0010000;
+            2'b10 : side_to_seg <= 7'b1011000;
+            2'b11 : side_to_seg <= 7'b0001000; 
+        endcase
+        
+    end
+
 	always @(posedge clk_out) begin
 		counter <= counter + 1;
-		
-//		light_out <= ~light_out;
-		
-//		case (light_out)
-//		  1'b0 : lights_on <= 4'b1110;
-//		  1'b1 : lights_on <= 4'b0111;
-//		endcase
-		
-		if (reset) begin
+		 
+        if (reset) begin
 		   tbase <= 4'd6;
 		   text <= 4'd3;
 		   tyel  <= 4'd2;
-		   //light_out <= 1'b0;
+		   refresh <= 1'b0;
 		   cur_state <= R_y;
 		   main_light <= 2'b0;
 		   side_light <= 2'b0;
