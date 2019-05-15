@@ -1,4 +1,26 @@
-module clockDivider #(parameter n = 5000000) (input clk, rst, output reg clk_out);
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: 
+// 
+// Create Date: 05/15/2019 12:26:02 PM
+// Design Name: 
+// Module Name: clock_divider
+// Project Name: 
+// Target Devices: 
+// Tool Versions: 
+// Description: 
+// 
+// Dependencies: 
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
+
+
+module clockDivider #(parameter n = 50000000) (input clk, rst, output reg clk_out);
 reg [31:0] count; // Big enough to hold the maximum possible value
 // Increment count
 always @ (posedge(clk), posedge(rst)) begin // Asynchronous Reset
