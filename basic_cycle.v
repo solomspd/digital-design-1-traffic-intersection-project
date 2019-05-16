@@ -72,7 +72,7 @@ state index:
 
 */
 
-module basic_cycle(input clk, input reset, input sensor, input walk, /*output reg [1:0]main_light, output reg [1:0]side_light,*/ output reg walk_light, output reg [6:0]to_seg, output reg [3:0]lights_on, output reg refresh);
+module basic_cycle(input clk, input reset, input sensor, input walk, /*output reg [1:0]main_light, output reg [1:0]side_light,*/ output reg walk_light, output reg [6:0]to_seg, output reg [3:0]lights_on);
 	
 	reg [2:0] cur_state;
 	reg [3:0] counter;
@@ -103,23 +103,25 @@ module basic_cycle(input clk, input reset, input sensor, input walk, /*output re
     reg [6:0]main_to_seg;
     reg [6:0]side_to_seg;
     
+    reg refresh = 1'b0;
     //reg refresh;
     wire clk_out;
-    
+    wire clk_out_2;
     clockDivider pp (clk, rst, clk_out);
+      clockDivider#(1000) qq (clk, rst, clk_out_2);
 
-    always @(posedge clk) begin
-        
-        refresh <= ~refresh;
+    always @(posedge clk_out_2) begin
         
         case (refresh)
                 1'b0 : begin 
                         lights_on <= 4'b0111; //isnt this to seg
                         to_seg <= main_to_seg;
+                        refresh <= 1'b1;
                        end
                 1'b1 : begin
                         lights_on <= 4'b1110;
                         to_seg <= side_to_seg;
+                         refresh <= 1'b0;
                        end
         endcase
         
@@ -146,7 +148,6 @@ module basic_cycle(input clk, input reset, input sensor, input walk, /*output re
 		   tbase <= 4'd6;
 		   text <= 4'd3;
 		   tyel  <= 4'd2;
-		   refresh <= 1'b0;
 		   cur_state <= R_y;
 		   main_light <= 2'b0;
 		   side_light <= 2'b0;
