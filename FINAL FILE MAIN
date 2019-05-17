@@ -72,7 +72,7 @@ state index:
 
 */
 
-module basic_cycle(input clk, input reset, input [3:0]walk,input sensor, /*output reg [1:0]main_light, output reg [1:0]side_light,*/ output reg walk_light, output reg [6:0]to_seg, output reg [3:0]lights_on);
+module basic_cycle(input clk, input reset, input [3:0]walk,input sensor, output reg walk_light, output reg [6:0]to_seg, output reg [3:0]lights_on);
 	
 	reg [2:0] cur_state;
 	reg [3:0] counter;
@@ -106,34 +106,44 @@ module basic_cycle(input clk, input reset, input [3:0]walk,input sensor, /*outpu
     wire [3:0]c;
     wire [3:0]b ;
     
-    sync ones(walk[0], clk, rst, b[0]);
-    debouncer oned(b[0], clk, c[0]);
-    
-     sync twos(walk[1], clk, rst, b[1]);
-        debouncer twod(b[1], clk, c[1]);
-        
-       sync threes(walk[2], clk, rst, b[2]);
-         debouncer threed(b[2], clk, c[2]);
-            sync fours(walk[3], clk, rst, b[3]);
-                     debouncer fourd(b[3], clk, c[3]);
-
     wire clk_out;
     wire clk_out_2;
+    
+    
+    debouncer oned(walk[0], clk, b[0]);
+    sync ones(b[0], clk_out, rst, c[0]);
+    
+    debouncer twod(walk[1], clk, b[1]);
+    sync twos(b[1], clk_out, rst, c[1]);
+        
+    debouncer threed(walk[2], clk, b[2]);
+    sync threes(b[2], clk_out, rst, c[2]);
+    
+    debouncer fourd(walk[3], clk, b[3]);
+    sync fours(b[3], clk_out, rst, c[3]);
+
+
     clockDivider pp (clk, rst, clk_out);
     clockDivider#(1000) qq (clk, rst, clk_out_2);
 
     always @(posedge clk_out_2) begin
+    
+//        walk_debug <= walk_req;
+//        cc = c;
+//        if (c == 4'b0100 & cur_state != R_r) begin
+//             walk_req <= 1'b1;
+//        end
         
         case (refresh)
                 1'b0 : begin 
-                        lights_on <= 4'b0111; //isnt this to seg
-                        to_seg <= main_to_seg;
+                        to_seg <= side_to_seg;
+                        lights_on <= 4'b0111;
                         refresh <= 1'b1;
                        end
                 1'b1 : begin
+                        to_seg <= main_to_seg;
                         lights_on <= 4'b1110;
-                        to_seg <= side_to_seg;
-                         refresh <= 1'b0;
+                        refresh <= 1'b0;
                        end
         endcase
         
@@ -148,13 +158,15 @@ module basic_cycle(input clk, input reset, input [3:0]walk,input sensor, /*outpu
             2'b00 : side_to_seg <= 7'b0000001;
             2'b01 : side_to_seg <= 7'b0010000;
             2'b10 : side_to_seg <= 7'b1011000;
-            2'b11 : side_to_seg <= 7'b0001000; 
+            2'b11 : side_to_seg <= 7'b0111001; 
         endcase
         
     end
 
 	always @(posedge clk_out) begin
 		counter <= counter + 1;
+		 
+		
 		 
         if (reset) begin
 		   tbase <= 4'd6;
@@ -170,26 +182,20 @@ module basic_cycle(input clk, input reset, input [3:0]walk,input sensor, /*outpu
 		   walk_req <= 1'b0;
 		end
 		     
-		     if (c > 0 & ~R_r) begin
-		        walk_req <= 1'b1;
-		     end
-		     
-		    if (sensor & G_r & counter == tbase) begin
+		    if (c > 4'b0 & cur_state != R_r) begin
+		       walk_req <= 1'b1;
+		    end
+            
+		    if (sensor & cur_state == G_r & counter == tbase) begin
                 sen_flag <= 1'b1;
                 main_wait <= tbase + text;
             end
             
-            if (sensor & R_g & counter == tbase) begin
+            if (sensor & cur_state == R_g & counter == tbase - 1) begin
                 sen_flag <= 1'b1;
                 side_wait <= tbase + text;
             end
-            if (sen_flag) begin
-                sen_flag <= 1'b0;
-                main_wait <= 2 * tbase;
-                side_wait <= tbase;
-                end
-            
-            
+           
 			case(cur_state)
 				G_r: 
 					if (counter == main_wait) begin
@@ -197,6 +203,9 @@ module basic_cycle(input clk, input reset, input [3:0]walk,input sensor, /*outpu
 						cur_state <= Y_r;
 						main_light <= yel;
 						side_light <= red;
+						sen_flag <= 1'b0;
+                        main_wait <= 2 * tbase;
+                        side_wait <= tbase;
 					end
 				Y_r:
 					if (counter == tyel) begin
@@ -219,6 +228,9 @@ module basic_cycle(input clk, input reset, input [3:0]walk,input sensor, /*outpu
 						cur_state <= R_y;
 						main_light <= red;
 						side_light <= yel;
+						sen_flag <= 1'b0;
+                        main_wait <= 2 * tbase;
+                        side_wait <= tbase;
 					end
 				R_y:
 					if (counter == tyel) begin
