@@ -1,0 +1,12 @@
+#-----------------------------------------------------------
+# Vivado v2016.4 (64-bit)
+# SW Build 1733598 on Wed Dec 14 22:35:39 MST 2016
+# IP Build 1731160 on Wed Dec 14 23:47:21 MST 2016
+# Start of session at: Fri May 17 15:51:06 2019
+# Process ID: 8364
+# Current directory: C:/Users/solomspd.AUC/project_1/project_1.runs/impl_1
+# Command line: vivado.exe -log basic_cycle.vdi -applog -product Vivado -messageDb vivado.pb -mode batch -source basic_cycle.tcl -notrace
+# Log file: C:/Users/solomspd.AUC/project_1/project_1.runs/impl_1/basic_cycle.vdi
+# Journal file: C:/Users/solomspd.AUC/project_1/project_1.runs/impl_1\vivado.jou
+#-----------------------------------------------------------
+source basic_cycle.tcl -notrace
